@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Cookie Exchange</title>
+    <style>
+        /* Styles for the website */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+        }
+        header {
+            background-color: #ffcc99;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #d2691e;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .event-info, .rsvp, .attendees {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .event-info img, .rsvp img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #d2691e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #c3561c;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Holiday Cookie Exchange</h1>
+    <p>Join us for an evening of sweet treats and holiday cheer!</p>
+</header>
+
+<div class="container">
+
+    <!-- Event Info Section -->
+    <section class="event-info">
+        <h2>Event Details</h2>
+        <img src="path/to/your/image.jpg" alt="Cookies" />
+        <p>Date: December 15, 2024</p>
+        <p>Time: 6:00 PM</p>
+        <p>Location: 123 Holiday Lane, Cookie Town</p>
+        <p>Bring your favorite cookies to share, and taste a variety of treats from friends and neighbors. Be sure to RSVP and let us know what type of cookies you’ll be bringing!</p>
+    </section>
+
+    <!-- RSVP Form Section -->
+    <section class="rsvp">
+        <h2>RSVP Here</h2>
+        <p>Let us know you're coming and what cookies you plan to bring:</p>
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Your name" required />
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" placeholder="Your email" required />
+
+        <label for="cookieType">Cookie Type:</label>
+        <input type="text" id="cookieType" placeholder="What cookies will you bring?" required />
+
+        <button onclick="submitRSVP()">RSVP</button>
+    </section>
+
+    <!-- Attendees List Section -->
+    <section class="attendees">
+        <h2>Who's Bringing What</h2>
+        <ul id="attendeesList">
+            <!-- RSVP entries will appear here -->
+        </ul>
+    </section>
+
+</div>
+
+<script>
+    async function submitRSVP() {
+        const name = document.getElementById('name').value;
+        const cookieType = document.getElementById('cookieType').value;
+
+        if (name && cookieType) {
+            // Send data to the server
+            const response = await fetch('/attendees', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, cookieType })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                updateAttendeesList(); // Refresh the list of attendees
+            } else {
+                alert("Failed to submit RSVP.");
+            }
+
+            // Clear the form
+            document.getElementById('name').value = '';
+            document.getElementById('cookieType').value = '';
+        } else {
+            alert("Please fill out all fields.");
+        }
+    }
+
+    async function updateAttendeesList() {
+        const response = await fetch('/attendees');
+        const attendees = await response.json();
+
+        const attendeeList = document.getElementById('attendeesList');
+        attendeeList.innerHTML = '';
+
+        attendees.forEach(attendee => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${attendee.name} - ${attendee.cookieType}`;
+            attendeeList.appendChild(listItem);
+        });
+    }
+
+    // Load attendees when the page loads
+    window.onload = updateAttendeesList;
+</script>
+
+</body>
+</html>
